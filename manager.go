@@ -47,11 +47,17 @@ func (m *Manager) syncer(devices []*Device) {
 			m.r.Resolve(m.devices[dNew.ID])
 		}
 	}
+
+outer:
 	for _, dOld := range m.devices {
-		if _, ok := m.devices[dOld.ID]; !ok {
-			delete(m.devices, dOld.ID)
+		for _, dNew := range devices {
+			if dOld.ID == dNew.ID {
+				continue outer
+			}
 		}
+		delete(m.devices, dOld.ID)
 	}
+
 	m.devMu.Unlock()
 
 	log.Println("Manager: synced", len(devices), "Devices")
