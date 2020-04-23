@@ -1,0 +1,386 @@
+{
+  "version": 2,
+  "tables": [
+    {
+      "table": {
+        "schema": "public",
+        "name": "device"
+      },
+      "object_relationships": [
+        {
+          "name": "device_type",
+          "using": {
+            "foreign_key_constraint_on": "device_type_id"
+          }
+        }
+      ],
+      "array_relationships": [
+        {
+          "name": "ip_statuses",
+          "using": {
+            "manual_configuration": {
+              "remote_table": {
+                "schema": "public",
+                "name": "ip_status"
+              },
+              "column_mapping": {
+                "id": "device_id"
+              }
+            }
+          }
+        }
+      ],
+      "insert_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "check": {},
+            "columns": [
+              "device_type_id",
+              "hostname"
+            ]
+          }
+        }
+      ],
+      "select_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "device_type_id",
+              "id",
+              "hostname"
+            ],
+            "filter": {}
+          }
+        },
+        {
+          "role": "pinger",
+          "permission": {
+            "columns": [
+              "hostname",
+              "id"
+            ],
+            "filter": {}
+          }
+        },
+        {
+          "role": "viewer",
+          "permission": {
+            "columns": [
+              "device_type_id",
+              "id",
+              "hostname"
+            ],
+            "filter": {}
+          }
+        }
+      ],
+      "update_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "device_type_id",
+              "hostname"
+            ],
+            "filter": {}
+          }
+        }
+      ],
+      "delete_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "filter": {}
+          }
+        }
+      ]
+    },
+    {
+      "table": {
+        "schema": "public",
+        "name": "device_type"
+      },
+      "array_relationships": [
+        {
+          "name": "devices",
+          "using": {
+            "foreign_key_constraint_on": {
+              "column": "device_type_id",
+              "table": {
+                "schema": "public",
+                "name": "device"
+              }
+            }
+          }
+        }
+      ],
+      "insert_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "check": {},
+            "columns": [
+              "name"
+            ]
+          }
+        }
+      ],
+      "select_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "id",
+              "name"
+            ],
+            "filter": {}
+          }
+        },
+        {
+          "role": "viewer",
+          "permission": {
+            "columns": [
+              "id",
+              "name"
+            ],
+            "filter": {}
+          }
+        }
+      ],
+      "update_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "name"
+            ],
+            "filter": {}
+          }
+        }
+      ],
+      "delete_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "filter": {}
+          }
+        }
+      ]
+    },
+    {
+      "table": {
+        "schema": "public",
+        "name": "ip_status"
+      },
+      "object_relationships": [
+        {
+          "name": "ping_aggregate",
+          "using": {
+            "manual_configuration": {
+              "remote_table": {
+                "schema": "public",
+                "name": "ping_aggregate_template"
+              },
+              "column_mapping": {
+                "device_id": "device_id",
+                "ip": "ip"
+              }
+            }
+          }
+        }
+      ],
+      "array_relationships": [
+        {
+          "name": "pings",
+          "using": {
+            "manual_configuration": {
+              "remote_table": {
+                "schema": "public",
+                "name": "ping"
+              },
+              "column_mapping": {
+                "device_id": "device_id",
+                "ip": "ip"
+              }
+            }
+          }
+        }
+      ],
+      "select_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "device_id",
+              "ip",
+              "sent_time",
+              "rtt"
+            ],
+            "filter": {}
+          }
+        },
+        {
+          "role": "viewer",
+          "permission": {
+            "columns": [
+              "ip",
+              "rtt",
+              "sent_time",
+              "device_id"
+            ],
+            "filter": {}
+          }
+        }
+      ]
+    },
+    {
+      "table": {
+        "schema": "public",
+        "name": "ping"
+      },
+      "object_relationships": [
+        {
+          "name": "device",
+          "using": {
+            "foreign_key_constraint_on": "device_id"
+          }
+        }
+      ],
+      "insert_permissions": [
+        {
+          "role": "pinger",
+          "permission": {
+            "check": {},
+            "columns": [
+              "ip",
+              "rtt",
+              "sent_time",
+              "device_id"
+            ]
+          }
+        }
+      ],
+      "select_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "ip",
+              "rtt",
+              "sent_time",
+              "device_id"
+            ],
+            "filter": {},
+            "allow_aggregations": true
+          }
+        },
+        {
+          "role": "pinger",
+          "permission": {
+            "columns": [
+              "sent_time"
+            ],
+            "filter": {}
+          }
+        },
+        {
+          "role": "viewer",
+          "permission": {
+            "columns": [
+              "device_id",
+              "sent_time",
+              "rtt",
+              "ip"
+            ],
+            "filter": {},
+            "allow_aggregations": true
+          }
+        }
+      ],
+      "delete_permissions": [
+        {
+          "role": "pinger",
+          "permission": {
+            "filter": {}
+          }
+        }
+      ]
+    },
+    {
+      "table": {
+        "schema": "public",
+        "name": "ping_aggregate_template"
+      },
+      "object_relationships": [
+        {
+          "name": "device",
+          "using": {
+            "foreign_key_constraint_on": "device_id"
+          }
+        },
+        {
+          "name": "ip_status",
+          "using": {
+            "manual_configuration": {
+              "remote_table": {
+                "schema": "public",
+                "name": "ip_status"
+              },
+              "column_mapping": {
+                "device_id": "device_id",
+                "ip": "ip"
+              }
+            }
+          }
+        }
+      ],
+      "select_permissions": [
+        {
+          "role": "manager",
+          "permission": {
+            "columns": [
+              "device_id",
+              "ip",
+              "total",
+              "lost",
+              "loss_pct",
+              "max",
+              "min",
+              "avg",
+              "stddev"
+            ],
+            "filter": {},
+            "allow_aggregations": true
+          }
+        },
+        {
+          "role": "viewer",
+          "permission": {
+            "columns": [
+              "device_id",
+              "ip",
+              "total",
+              "lost",
+              "loss_pct",
+              "max",
+              "min",
+              "avg",
+              "stddev"
+            ],
+            "filter": {}
+          }
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "function": {
+        "schema": "public",
+        "name": "ping_aggregate_over"
+      }
+    }
+  ]
+}

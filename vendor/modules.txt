@@ -1,0 +1,14 @@
+# github.com/gofrs/uuid v3.2.0+incompatible
+github.com/gofrs/uuid
+# github.com/gorilla/websocket v1.4.2
+github.com/gorilla/websocket
+# github.com/kelseyhightower/envconfig v1.4.0
+## explicit
+github.com/kelseyhightower/envconfig
+# github.com/korylprince/go-graphql-ws v0.3.4
+## explicit
+github.com/korylprince/go-graphql-ws
+# github.com/korylprince/go-icmpv4/v2 v2.0.2
+## explicit
+github.com/korylprince/go-icmpv4/v2
+github.com/korylprince/go-icmpv4/v2/echo
