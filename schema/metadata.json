@@ -28,6 +28,31 @@
               }
             }
           }
+        },
+        {
+          "name": "pings",
+          "using": {
+            "foreign_key_constraint_on": {
+              "column": "device_id",
+              "table": {
+                "schema": "public",
+                "name": "ping"
+              }
+            }
+          }
+        }
+      ],
+      "computed_fields": [
+        {
+          "name": "aggregate",
+          "definition": {
+            "function": {
+              "schema": "public",
+              "name": "ping_aggregate_over"
+            },
+            "table_argument": null
+          },
+          "comment": ""
         }
       ],
       "insert_permissions": [
@@ -174,40 +199,6 @@
         "schema": "public",
         "name": "ip_status"
       },
-      "object_relationships": [
-        {
-          "name": "ping_aggregate",
-          "using": {
-            "manual_configuration": {
-              "remote_table": {
-                "schema": "public",
-                "name": "ping_aggregate_template"
-              },
-              "column_mapping": {
-                "device_id": "device_id",
-                "ip": "ip"
-              }
-            }
-          }
-        }
-      ],
-      "array_relationships": [
-        {
-          "name": "pings",
-          "using": {
-            "manual_configuration": {
-              "remote_table": {
-                "schema": "public",
-                "name": "ping"
-              },
-              "column_mapping": {
-                "device_id": "device_id",
-                "ip": "ip"
-              }
-            }
-          }
-        }
-      ],
       "select_permissions": [
         {
           "role": "manager",
@@ -315,12 +306,6 @@
       },
       "object_relationships": [
         {
-          "name": "device",
-          "using": {
-            "foreign_key_constraint_on": "device_id"
-          }
-        },
-        {
           "name": "ip_status",
           "using": {
             "manual_configuration": {
@@ -373,14 +358,6 @@
           }
         }
       ]
-    }
-  ],
-  "functions": [
-    {
-      "function": {
-        "schema": "public",
-        "name": "ping_aggregate_over"
-      }
     }
   ]
 }

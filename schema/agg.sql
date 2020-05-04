@@ -11,20 +11,21 @@ CREATE TABLE ping_aggregate_template (
     FOREIGN KEY (device_id) REFERENCES device(id)
 );
 
-CREATE FUNCTION ping_aggregate_over(duration INTERVAL)
+CREATE FUNCTION ping_aggregate_over(device_row device, duration INTERVAL)
 RETURNS SETOF ping_aggregate_template AS $$
     SELECT
         device_id,
         ip,
         COUNT(*) AS total,
         SUM(CASE WHEN rtt IS NULL THEN 1 ELSE 0 END) AS lost,
-        CAST(SUM(CASE WHEN rtt IS NULL THEN 1 ELSE 0 END) * 100 / CAST(COUNT(*) AS NUMERIC(5, 2)) AS NUMERIC(5, 2)) AS loss_pct,
+        CAST(SUM(CASE WHEN rtt IS NULL THEN 1 ELSE 0 END) * 100 / CAST(COUNT(*) AS NUMERIC(6, 2)) AS NUMERIC(6, 2)) AS loss_pct,
         CAST(MAX(rtt) AS NUMERIC(6, 2)) AS max,
         CAST(MIN(rtt) AS NUMERIC(6, 2)) AS min,
         CAST(AVG(rtt) AS NUMERIC(6, 2)) AS avg,
         CAST(STDDEV(rtt) AS NUMERIC(6, 2)) AS stddev
     FROM ping
-    WHERE sent_time > (NOW() AT TIME ZONE 'UTC') - duration
+    WHERE device_row.id = device_id AND
+        sent_time > (NOW() AT TIME ZONE 'UTC') - duration
     GROUP BY device_id, ip;
 $$ LANGUAGE sql STABLE;
 
