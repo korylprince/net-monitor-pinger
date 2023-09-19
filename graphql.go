@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -117,83 +116,4 @@ func (g *GraphQLService) subscribeDevices() error {
 func (g *GraphQLService) SubscribeDevices(f func(devices []*Device)) error {
 	g.subscribeHandler = f
 	return g.subscribeDevices()
-}
-
-func (g *GraphQLService) InsertPings(reqs []*Ping) error {
-	type ping struct {
-		DeviceID string    `json:"device_id"`
-		IP       string    `json:"ip"`
-		SentTime time.Time `json:"sent_time"`
-		RTT      *int64    `json:"rtt"`
-	}
-
-	type response struct {
-		InsertPing struct {
-			AffectedRows int `json:"affected_rows"`
-		} `json:"insert_ping"`
-	}
-
-	pings := make([]*ping, 0, len(reqs))
-	for _, r := range reqs {
-		p := &ping{
-			DeviceID: r.Device.ID,
-			IP:       r.IP.String(),
-			SentTime: r.SentTime.UTC(),
-		}
-		if r.RecvTime != nil {
-			rtt := r.RecvTime.Sub(r.SentTime).Milliseconds()
-			p.RTT = &rtt
-		}
-		pings = append(pings, p)
-	}
-
-	var q = &graphql.MessagePayloadStart{
-		Query: gqlInsertPings,
-		Variables: map[string]interface{}{
-			"pings": pings,
-		},
-	}
-
-	data, err := g.conn.Execute(context.Background(), q)
-	if err != nil {
-		return fmt.Errorf("Unable to execute mutation: %v", err)
-	}
-
-	r := new(response)
-	if err = json.Unmarshal(data.Data, r); err != nil {
-		return fmt.Errorf("Unable to parse response: %v", err)
-	}
-
-	if r.InsertPing.AffectedRows != len(reqs) {
-		return fmt.Errorf("Unable to insert all pings: Sent: %d, Inserted: %d", len(reqs), r.InsertPing.AffectedRows)
-	}
-
-	return nil
-}
-
-func (g *GraphQLService) PurgePings(before time.Time) error {
-	type response struct {
-		DeletePing struct {
-			AffectedRows int `json:"affected_rows"`
-		} `json:"delete_ping"`
-	}
-
-	var q = &graphql.MessagePayloadStart{
-		Query:     gqlPurgePings,
-		Variables: map[string]interface{}{"time": before.UTC()},
-	}
-
-	data, err := g.conn.Execute(context.Background(), q)
-	if err != nil {
-		return fmt.Errorf("Unable to execute mutation: %v", err)
-	}
-
-	r := new(response)
-	if err = json.Unmarshal(data.Data, r); err != nil {
-		return fmt.Errorf("Unable to parse response: %v", err)
-	}
-
-	log.Println("GraphQLService: Purged", r.DeletePing.AffectedRows, "Pings")
-
-	return nil
 }

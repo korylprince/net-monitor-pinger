@@ -11,3 +11,5 @@ CREATE TABLE device (
     hostname VARCHAR NOT NULL UNIQUE CHECK (0 < char_length(hostname) AND char_length(hostname) < 256),
     FOREIGN KEY (device_type_id) REFERENCES device_type(id)
 );
+
+CREATE INDEX ON device(device_type_id);

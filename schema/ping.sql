@@ -7,4 +7,6 @@ CREATE TABLE ping (
     FOREIGN KEY (device_id) REFERENCES device(id) ON DELETE CASCADE
 );
 
-CREATE INDEX ping_ip ON ping (ip);
+CREATE INDEX ON ping(device_id);
+CREATE INDEX ON ping(sent_time);
+CREATE INDEX ON ping(ip);
